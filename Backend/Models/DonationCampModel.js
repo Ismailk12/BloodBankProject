@@ -1,75 +1,59 @@
-/********************* Import The Mongoose Library *********************/
+const { DataTypes } = require('sequelize');
+const sequelize = require('../Database/Database');
 
-const Mongoose = require("mongoose");
-
-
-
-/********************* Create The Schema *********************/
-
-const DonationCampSchema = new Mongoose.Schema({
-
-    ///**************** Declare The Fields Present In The Collection ****************///
-
+const DonationCamp = sequelize.define('DonationCamp', {
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true
+    },
     CampName: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     ConductedBy: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     OrganizedBy: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     Email: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     State: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     District: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     Register: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     Date: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     Time: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     Contact: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     Address: {
-        type: String,
-        required: true
+        type: DataTypes.TEXT,
+        allowNull: false
     }
-
 }, {
+    tableName: 'DonationCamps',
     timestamps: true
 });
 
-
-
-/********************* Create The Model From Schema And Connect To The MongoDB Collection And Export The Model *********************/
-
-module.exports = Mongoose.model("DonationCamp", DonationCampSchema, "DonationCamps");
+module.exports = DonationCamp;

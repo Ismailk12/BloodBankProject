@@ -3,11 +3,9 @@
 require("dotenv").config();
 const Express = require("express");
 const BodyParser = require("body-parser");
-const Mongoose = require("mongoose");
+const sequelize = require("./Database/Database"); // Sequelize instance
 const CookieParser = require("cookie-parser");
 const FileUpload = require("express-fileupload");
-
-
 
 /********************* Import The Routes *********************/
 
@@ -19,21 +17,15 @@ const DonationCampRouter = require("./Routes/DonationCampRouter");
 const DonationRequestRouter = require("./Routes/DonationRequestRouter");
 const PaymentsRouter = require("./Routes/PaymentsRouter");
 
-
-
 /********************* Initialise The Libraries *********************/
 
 const App = Express();
 App.use(BodyParser.json());
 // App.use(Express.urlencoded({ extended: true }));
 App.use(CookieParser());
-App.use(FileUpload(
-    {
-        useTempFiles: true
-    }
-));
-
-
+App.use(FileUpload({
+    useTempFiles: true
+}));
 
 /********************* Handle The CORS *********************/
 
@@ -43,8 +35,6 @@ App.use((request, response, next) => {
     response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     next();
 });
-
-
 
 /********************* Start Using The Routes *********************/
 
@@ -56,29 +46,20 @@ App.use("/", DonationCampRouter);
 App.use("/", DonationRequestRouter);
 App.use("/", PaymentsRouter);
 
-
-
 /********************* Declare The PORT *********************/
 
 const PORT = process.env.PORT || 5000;
 
+/********************* Connect To SQLite & Sync Models *********************/
 
+sequelize.sync({ force: false }).then(() => {
+    console.log("Connected to SQLite and Models Synced");
 
-/********************* Connect To MongoDB *********************/
-
-const URI = process.env.MONGODB_URL;
-
-Mongoose.connect(URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(Success => {
-    console.log("Connected to MongoDB");
-
-    ///**************** Start The Server ****************///
+    /**************** Start The Server ****************/
 
     App.listen(PORT, () => {
         console.log(`Server is listening at Port : ${PORT}`)
     });
-}).catch(Error => {
-    console.log("Connection Error" + Error);
+}).catch(error => {
+    console.error("Database Connection Error:", error);
 });

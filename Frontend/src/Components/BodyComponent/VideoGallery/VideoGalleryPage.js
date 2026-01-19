@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './VideoGalleryPage.css';
 import { Loading } from '../../Utilities/Notification';
 
@@ -6,8 +6,12 @@ function VideoGalleryPage() {
 
     const [loading, setLoading] = useState(true);
 
+    useEffect(() => {
+        setLoading(false);
+    }, []);
+
     return (
-        <div className="VideoGalleryPage" onLoad={() => setLoading(false)}>
+        <div className="VideoGalleryPage">
 
             {loading && <Loading loading={loading} />}
 

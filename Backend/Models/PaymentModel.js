@@ -1,111 +1,87 @@
-/********************* Import The Mongoose Library *********************/
+const { DataTypes } = require('sequelize');
+const sequelize = require('../Database/Database');
 
-const Mongoose = require("mongoose");
-
-
-
-/********************* Create The Schema *********************/
-
-const PaymentSchema = new Mongoose.Schema({
-
-    ///**************** Declare The Fields Present In The Collection ****************///
-
+const Payment = sequelize.define('Payment', {
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true
+    },
     EMAIL: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     MOBILE_NO: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     RECIEVER_RREQUEST_ID: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     RECIEVER_EMAIL: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     TXNID: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     BANKTXNID: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     ORDERID: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     TXNAMOUNT: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     STATUS: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     TXNTYPE: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     GATEWAYNAME: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     RESPCODE: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     RESPMSG: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     BANKNAME: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     MID: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     PAYMENTMODE: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     REFUNDAMT: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     TXNDATE: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     }
-
 }, {
+    tableName: 'Payments',
     timestamps: true
 });
 
-
-
-/********************* Create The Model From Schema And Connect To The MongoDB Collection And Export The Model *********************/
-
-module.exports = Mongoose.model("Payment", PaymentSchema, "Payments");
+module.exports = Payment;

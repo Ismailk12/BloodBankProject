@@ -1,56 +1,43 @@
-/********************* Import The Mongoose Library *********************/
+const { DataTypes } = require('sequelize');
+const sequelize = require('../Database/Database');
 
-const Mongoose = require("mongoose");
-
-
-
-/********************* Create The Schema *********************/
-
-const FundraisingSchema = new Mongoose.Schema({
-
-    ///**************** Declare The Fields Present In The Collection ****************///
-
+const Fundraising = sequelize.define('Fundraising', {
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true
+    },
     UserID: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     Email: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     Heading: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     Amount: {
-        type: Number,
-        required: true
+        type: DataTypes.FLOAT,
+        allowNull: false
     },
-
     RecievedFunds: {
-        type: Number,
-        default: 0
+        type: DataTypes.FLOAT,
+        defaultValue: 0
     },
-
     Description: {
-        type: String,
-        required: true
+        type: DataTypes.TEXT,
+        allowNull: false
     },
-
     Image: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     }
-
 }, {
+    tableName: 'Fundraising',
     timestamps: true
 });
 
-
-
-/********************* Create The Model From Schema And Connect To The MongoDB Collection And Export The Model *********************/
-
-module.exports = Mongoose.model("FundraisingModel", FundraisingSchema, "Fundraising");
+module.exports = Fundraising;

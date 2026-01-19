@@ -40,15 +40,15 @@ function RegisterDonerPage() {
     /********************* Get Location *********************/
     useEffect(() => {
         let isMount = true;
-        if(isMount === true){
+        if (isMount === true) {
             Server.get("/locations").then((Response) => {
                 setState(Response.data.states);
-    
+
             }).catch((Error) => {
                 setUser({ ...user, Error: Error.response.data.message, Success: "" });
             });
         };
-        return()=>{isMount=false;};
+        return () => { isMount = false; };
     }, [user]);
 
     useEffect(() => {
@@ -67,9 +67,21 @@ function RegisterDonerPage() {
 
     /********************* Handle State *********************/
     const handleState = (e) => {
-        document.getElementById('district').value = "";
+        const districtSelect = document.getElementById('district');
+        if (districtSelect) districtSelect.value = "";
         setUser({ ...user, State: e.target.value, Error: "", Success: "" });
-        setDistrict(state.find(location => location.state === e.target.value).districts);
+        const foundState = state.find(location => location.state === e.target.value);
+        if (foundState && foundState.district) {
+            try {
+                const parsedDistricts = JSON.parse(foundState.district);
+                setDistrict(parsedDistricts);
+            } catch (error) {
+                console.error("Error parsing districts:", error);
+                setDistrict([]);
+            }
+        } else {
+            setDistrict([]);
+        }
     };
 
     /********************* Handle Pin Code *********************/
@@ -196,7 +208,7 @@ function RegisterDonerPage() {
 
                                 {
                                     district.map((element) => (
-                                        <option key={element.index} name="District" value={element.district}>{element.district}</option>
+                                        <option key={element.index} name="District" value={element.name}>{element.name}</option>
                                     ))
                                 }
                             </select>

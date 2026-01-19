@@ -88,7 +88,7 @@ function Header() {
                                     <>
                                         <div>
                                             <span className="User-Profile-Name">
-                                                <img src={user.Avatar} alt="" />
+                                                <img src={user.Avatar} alt="" onError={(e) => { e.target.onerror = null; e.target.src = "https://www.w3schools.com/howto/img_avatar.png" }} />
                                                 <strong>{user.FirstName}</strong>
                                             </span>
                                             <i className="fas fa-sort-up up-arrow"></i>

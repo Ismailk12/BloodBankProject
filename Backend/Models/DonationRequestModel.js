@@ -1,76 +1,63 @@
-/********************* Import The Mongoose Library *********************/
+const { DataTypes } = require('sequelize');
+const sequelize = require('../Database/Database');
 
-const Mongoose = require("mongoose");
-
-
-
-/********************* Create The Schema *********************/
-
-const DonationRequestSchema = new Mongoose.Schema({
-
-    ///**************** Declare The Fields Present In The Collection ****************///
-
+const DonationRequest = sequelize.define('DonationRequest', {
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true
+    },
     Name: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     Gender: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     DateOfBirth: {
-        type: Date,
-        required: true
+        type: DataTypes.DATE,
+        allowNull: false
     },
-
     MobileNumber: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     Address: {
-        type: String
+        type: DataTypes.TEXT,
+        allowNull: true
     },
-
     TentativeDate: {
-        type: Date
+        type: DataTypes.DATE,
+        allowNull: true
     },
-
     State: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     District: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     BloodBankName: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     BloodGroup: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     GoIID: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     GoIIDNumber: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     }
-
 }, {
+    tableName: 'DonationRequests',
     timestamps: true
 });
 
-
-
-/********************* Create The Model From Schema And Connect To The MongoDB Collection And Export The Model *********************/
-
-module.exports = Mongoose.model("DonationRequest", DonationRequestSchema, "DonationRequests");
+module.exports = DonationRequest;

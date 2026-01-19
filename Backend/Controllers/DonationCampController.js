@@ -1,8 +1,7 @@
 /********************* Import The Models *********************/
 
 const DonationCamp = require("../Models/DonationCampModel");
-
-
+const { Op } = require("sequelize");
 
 /********************* Export The Controller Functionality *********************/
 
@@ -24,7 +23,7 @@ exports.SaveDonationCamp = (Request, Response) => {
         Address
     } = Request.body;
 
-    const NewCamp = new DonationCamp({
+    DonationCamp.create({
         CampName,
         ConductedBy,
         OrganizedBy,
@@ -36,9 +35,7 @@ exports.SaveDonationCamp = (Request, Response) => {
         Time,
         Contact,
         Address
-    });
-
-    NewCamp.save().then(() => {
+    }).then(() => {
         Response.status(200).json({
             message: "Donation Camp Added Successfully"
         });
@@ -52,15 +49,13 @@ exports.SaveDonationCamp = (Request, Response) => {
 
 };
 
-
-
 ///**************** (2) Get Donation Camps By Email ****************///
 
 exports.GetDonationCampsByEmail = (Request, Response) => {
 
     const { Email } = Request.body;
 
-    DonationCamp.find({ Email }).then((Result) => {
+    DonationCamp.findAll({ where: { Email } }).then((Result) => {
         Response.status(200).json({
             message: "Donation Camps Fetched Successfully",
             camps: Result
@@ -74,8 +69,6 @@ exports.GetDonationCampsByEmail = (Request, Response) => {
     });
 
 };
-
-
 
 ///**************** (3) Filter Donation Camps ****************///
 
@@ -108,26 +101,23 @@ exports.FilterDonationCamps = (Request, Response) => {
         Filters.Date = Date;
     }
 
-    DonationCamp.find(Filters).then((Result) => {
-        let PageLimit = Limit;
-        let TemporaryArray = [];
+    DonationCamp.findAll({ where: Filters }).then((Result) => {
+        let PageLimit = Limit || Result.length;
+        let PageNumber = parseInt(Page);
 
         const Paginate = (Array, PageSize, PageNumber) => {
-
-            let PaginatedResult = [];
-            PaginatedResult = Array.slice((PageNumber - 1) * PageSize, PageNumber * PageSize);
+            let PaginatedResult = Array.slice((PageNumber - 1) * PageSize, PageNumber * PageSize);
             return PaginatedResult;
-
         };
 
-        TemporaryArray = Paginate(Result, PageLimit, Page);
+        let TemporaryArray = Paginate(Result, PageLimit, PageNumber);
 
         Response.status(200).json({
             message: "Donation Camps Filtered List",
             totalCamps: Result,
             camps: TemporaryArray,
             totalResultsCount: Result.length,
-            pageNumber: Page,
+            pageNumber: PageNumber,
             limit: PageLimit
         });
 

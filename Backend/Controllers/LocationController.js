@@ -2,15 +2,13 @@
 
 const Location = require("../Models/LocationModel");
 
-
-
 /********************* Export The Controller Functionality *********************/
 
 ///**************** (1) Get All Locations ****************///
 
 exports.GetAllLocations = (Request, Response) => {
 
-    Location.find().then(Result => {
+    Location.findAll().then(Result => {
         Response.status(200).json(
             {
                 message: "Location Fetched",
@@ -22,7 +20,7 @@ exports.GetAllLocations = (Request, Response) => {
         Response.status(500).json(
             {
                 message: "Error in Database",
-                error: Error
+                error: Error.message
             }
         )
     });

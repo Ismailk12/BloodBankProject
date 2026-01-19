@@ -29,6 +29,15 @@ const OAuth2Client = new OAuth2(
 
 const SendEmail = (To, VerificationCode, TXT, DESCRIPTION) => {
 
+    if (!MAILING_SERVICE_CLIENT_ID || MAILING_SERVICE_CLIENT_ID.includes("xxxx")) {
+        console.log("------------------------------------------");
+        console.log("SKIP EMAIL: Mailing credentials not configured.");
+        console.log(`TO: ${To}`);
+        console.log(`CODE: ${VerificationCode}`);
+        console.log("------------------------------------------");
+        return;
+    }
+
     OAuth2Client.setCredentials({
         refresh_token: MAILING_SERVICE_REFRESH_TOKEN
     });
@@ -64,6 +73,7 @@ const SendEmail = (To, VerificationCode, TXT, DESCRIPTION) => {
 
     SMTP_Transport.sendMail(MailOptions, (error, information) => {
         if (error) {
+            console.error("Email Error:", error.message);
             return error;
         } else {
             return information;

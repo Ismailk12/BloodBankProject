@@ -159,8 +159,12 @@ function FundraisingPage() {
         };
     };
 
+    useEffect(() => {
+        setLoading(false);
+    }, []);
+
     return (
-        <div className="Fundraising" onLoad={() => setLoading(false)}>
+        <div className="Fundraising">
 
             {loading && <Loading loading={loading} />}
             {Success && <SuccessMessage message={Success} />}

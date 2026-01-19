@@ -72,7 +72,18 @@ function StockAvailabilityPage() {
         setSelectedDistrict("");
         const value = e.target.value;
         setSelectedState(value);
-        setDistrict(state.find(location => location.state === value).districts);
+        const foundState = state.find(location => location.state === value);
+        if (foundState && foundState.district) {
+            try {
+                const parsedDistricts = JSON.parse(foundState.district);
+                setDistrict(parsedDistricts);
+            } catch (error) {
+                console.error("Error parsing districts:", error);
+                setDistrict([]);
+            }
+        } else {
+            setDistrict([]);
+        }
         setPage(1);
     };
 
@@ -140,7 +151,7 @@ function StockAvailabilityPage() {
 
                                 {
                                     district.map((element) => (
-                                        <option key={element.index} name="District" value={element.district}>{element.district}</option>
+                                        <option key={element.index} name="District" value={element.name}>{element.name}</option>
                                     ))
                                 }
                             </select>

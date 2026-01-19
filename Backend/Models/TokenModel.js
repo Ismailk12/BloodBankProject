@@ -1,34 +1,27 @@
-/********************* Import The Mongoose Library *********************/
+const { DataTypes } = require('sequelize');
+const sequelize = require('../Database/Database');
 
-const Mongoose = require("mongoose");
-
-
-
-/********************* Create The Schema *********************/
-
-const TokenSchema = new Mongoose.Schema({
-
-    ///**************** Declare The Fields Present In The Collection ****************///
-
+const Token = sequelize.define('Token', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
     token: {
-        type: String,
-        required: true
+        type: DataTypes.TEXT,
+        allowNull: false
     },
-
     createdAt: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     expiresAt: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     }
-
+}, {
+    tableName: 'Tokens',
+    timestamps: false // Mongoose model had custom timestamps
 });
 
-
-
-/********************* Create The Model From Schema And Connect To The MongoDB Collection And Export The Model *********************/
-
-module.exports = Mongoose.model("Token", TokenSchema, "Tokens");
+module.exports = Token;

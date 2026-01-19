@@ -1,5 +1,5 @@
 {
-  "proxy": "http://localhost:5000",
+  "proxy": "http://localhost:8005",
   "name": "blood_bank",
   "author": "Umar Farooque",
   "version": "0.1.0",

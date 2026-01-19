@@ -1,109 +1,88 @@
-/********************* Import The Mongoose Library *********************/
+const { DataTypes } = require('sequelize');
+const sequelize = require('../Database/Database');
 
-const Mongoose = require("mongoose");
-
-
-
-/********************* Create The Schema *********************/
-
-const UserSchema = new Mongoose.Schema({
-
-    ///**************** Declare The Fields Present In The Collection ****************///
-
+const User = sequelize.define('User', {
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true
+    },
     FirstName: {
-        type: String,
-        required: [true, "Please enter your First Name...!"]
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     LastName: {
-        type: String,
-        required: [false, "Please enter your Last Name...!"]
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     DateOfBirth: {
-        type: String,
-        required: [false, "Please enter your Date of Birth...!"]
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     Gender: {
-        type: String,
-        required: [true, "Please select your Gender...!"]
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     Email: {
-        type: String,
-        required: [true, "Please enter your Email...!"],
+        type: DataTypes.STRING,
+        allowNull: false,
         unique: true
     },
-
     State: {
-        type: String,
-        required: [true, "Please select your State...!"]
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     District: {
-        type: String,
-        required: [true, "Please select your District...!"]
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     PinCode: {
-        type: Number,
-        required: [true, "Please enter your Pin Code...!"]
+        type: DataTypes.INTEGER,
+        allowNull: false
     },
-
     MobileNumber: {
-        type: Number,
-        required: [true, "Please enter your Mobile Number...!"]
+        type: DataTypes.INTEGER,
+        allowNull: false
     },
-
     Password: {
-        type: String,
-        required: [true, "Please enter your Password...!"],
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     UserType: {
-        type: String,
-        required: [true, "Please enter your User Type...!"],
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     isAdmin: {
-        type: Boolean,
-        default: false
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     },
-
     Avatar: {
-        type: String,
-        default: "https://res.cloudinary.com/dhp9cooxt/image/upload/v1644387806/Avatar/Default_User_Profile_Picture.webp"
+        type: DataTypes.STRING,
+        defaultValue: "https://www.w3schools.com/howto/img_avatar.png"
     },
-
     Background: {
-        type: String,
-        default: "https://res.cloudinary.com/dhp9cooxt/image/upload/v1652097466/Background/Default%20Background.jpg"
+        type: DataTypes.STRING,
+        defaultValue: "https://www.w3schools.com/w3css/img_lights.jpg"
     },
-
     Verified: {
-        type: Boolean,
-        default: false
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     },
-
     BankAccountNumber: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     IFSC: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     UPI: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     }
-
 }, {
+    tableName: 'Users',
     timestamps: true
 });
 
-
-
-/********************* Create The Model From Schema And Connect To The MongoDB Collection And Export The Model *********************/
-
-module.exports = Mongoose.model("UserModel", UserSchema, "Users");
+module.exports = User;

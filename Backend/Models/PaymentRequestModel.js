@@ -1,45 +1,39 @@
-/********************* Import The Mongoose Library *********************/
+const { DataTypes } = require('sequelize');
+const sequelize = require('../Database/Database');
 
-const Mongoose = require("mongoose");
-
-
-
-/********************* Create The Schema *********************/
-
-const PaymentRequestSchema = new Mongoose.Schema({
-
-    ///**************** Declare The Fields Present In The Collection ****************///
-
+const PaymentRequest = sequelize.define('PaymentRequest', {
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true
+    },
     EMAIL: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     MOBILE_NO: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     ORDERID: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     TXNAMOUNT: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     RECIEVER_RREQUEST_ID: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     RECIEVER_EMAIL: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     }
-
 }, {
+    tableName: 'PaymentRequests',
     timestamps: true
 });
 
-
-
-/********************* Create The Model From Schema And Connect To The MongoDB Collection And Export The Model *********************/
-
-module.exports = Mongoose.model("PaymentRequest", PaymentRequestSchema, "PaymentRequests");
+module.exports = PaymentRequest;

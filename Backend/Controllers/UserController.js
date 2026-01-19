@@ -2,8 +2,7 @@
 
 const UserModel = require("../Models/UserModel");
 const Token = require("../Models/TokenModel");
-
-
+const { Op } = require("sequelize");
 
 /********************* Import All The Required Pakages *********************/
 
@@ -103,7 +102,7 @@ exports.RegisterNewUsers = (Request, Response) => {
         });
 
     } else {
-        UserModel.find({ Email }).then(Result => {
+        UserModel.findAll({ where: { Email } }).then(Result => {
             if (Result.length) {
                 Response.status(400).json({
                     status: "Failed",
@@ -113,6 +112,9 @@ exports.RegisterNewUsers = (Request, Response) => {
             } else {
 
                 const emailVerificationCode = generateCode();
+                console.log("------------------------------------------");
+                console.log(`VERIFICATION CODE FOR ${Email}: ${emailVerificationCode}`);
+                console.log("------------------------------------------");
                 const saltRounds = 12;
 
                 bcrypt.hash(emailVerificationCode, saltRounds).then((hashedEmailVerificationCode) => {
@@ -253,7 +255,7 @@ exports.ActivateEmail = (Request, Response) => {
                 EmailVerificationCode,
             } = Decoded;
 
-            UserModel.find({ Email }).then(Result => {
+            UserModel.findAll({ where: { Email } }).then(Result => {
                 if (Result.length > 0) {
                     Response.status(400).json({
                         message: "Account record doesn't exist or has been verified already. Please sign up or log in."
@@ -335,7 +337,7 @@ exports.UserLogin = (Request, Response) => {
         });
 
     } else {
-        UserModel.findOne({ Email }).then(Result => {
+        UserModel.findOne({ where: { Email } }).then(Result => {
             if (!Result) {
                 Response.status(400).json({
                     message: "This email does not exist...!"
@@ -346,7 +348,7 @@ exports.UserLogin = (Request, Response) => {
 
                 bcrypt.compare(Password, userPassword).then(isMatched => {
                     if (isMatched) {
-                        const Refresh_Token = createRefreshToken({ id: Result._id });
+                        const Refresh_Token = createRefreshToken({ id: Result.id });
 
                         Response.cookie("refreshtoken", Refresh_Token, {
                             httpOnly: true,
@@ -425,9 +427,12 @@ exports.ForgotPassword = (Request, Response) => {
 
     const { Email } = Request.body;
 
-    UserModel.findOne({ Email }).then(Result => {
+    UserModel.findOne({ where: { Email } }).then(Result => {
         if (Result) {
             const VerificationCode = generateCode();
+            console.log("------------------------------------------");
+            console.log(`PASSWORD RESET CODE FOR ${Email}: ${VerificationCode}`);
+            console.log("------------------------------------------");
             const saltRounds = 12;
 
             bcrypt.hash(VerificationCode, saltRounds).then((hashedVerificationCode) => {
@@ -438,13 +443,11 @@ exports.ForgotPassword = (Request, Response) => {
                 };
 
                 const Access_Token = createAccessToken(UserData);
-                const NewToken = new Token({
+                Token.create({
                     token: Access_Token,
-                    createdAt: Date.now(),
-                    expiresAt: Date.now() + 900000
-                });
-
-                NewToken.save().then(() => {
+                    createdAt: Date.now().toString(),
+                    expiresAt: (Date.now() + 900000).toString()
+                }).then(() => {
                     const DESCRIPTION = "To Reset Your Password Verify Your Email. The Code Will Expire in 15 Minutes...!";
 
                     SendEmail(Email, VerificationCode, "Reset your password", DESCRIPTION);
@@ -492,9 +495,12 @@ exports.VerifyUser = (Request, Response) => {
 
     const { Access_Token, Verification_Code } = Request.body;
 
-    Token.findOne({ token: Access_Token }).then((Data) => {
-        if (Date.now() >= Data.expiresAt) {
-            Token.findOneAndDelete({ token: Access_Token }).then(() => {
+    Token.findOne({ where: { token: Access_Token } }).then((Data) => {
+        if (!Data) {
+            return Response.status(404).json({ message: "Token not found" });
+        }
+        if (Date.now() >= parseInt(Data.expiresAt)) {
+            Token.destroy({ where: { token: Access_Token } }).then(() => {
                 Response.status(500).json({
                     message: "Code Expired... Try Again...!"
                 });
@@ -523,7 +529,7 @@ exports.VerifyUser = (Request, Response) => {
 
                     bcrypt.compare(Verification_Code, VerificationCode).then((isMatched) => {
                         if (isMatched) {
-                            Token.findOneAndDelete({ token: Access_Token }).then(() => {
+                            Token.destroy({ where: { token: Access_Token } }).then(() => {
                                 const user_Data = {
                                     _id,
                                     Email,
@@ -531,13 +537,11 @@ exports.VerifyUser = (Request, Response) => {
                                 };
 
                                 const NewAccessToken = createAccessToken(user_Data);
-                                const new_Token = new Token({
+                                Token.create({
                                     token: NewAccessToken,
-                                    createdAt: Date.now(),
-                                    expiresAt: Date.now() + 900000
-                                });
-
-                                new_Token.save().then(() => {
+                                    createdAt: Date.now().toString(),
+                                    expiresAt: (Date.now() + 900000).toString()
+                                }).then(() => {
                                     Response.status(200).json({
                                         status: "SUCCESS",
                                         message: "Code Verified Successfully...!",
@@ -593,9 +597,12 @@ exports.ResetPassword = (Request, Response) => {
 
     const { user_id, token, Password } = Request.body;
 
-    Token.findOne({ token: token }).then((Data) => {
-        if (Date.now() >= Data.expiresAt) {
-            Token.findOneAndDelete({ token: token }).then(() => {
+    Token.findOne({ where: { token: token } }).then((Data) => {
+        if (!Data) {
+            return Response.status(404).json({ message: "Token not found" });
+        }
+        if (Date.now() >= parseInt(Data.expiresAt)) {
+            Token.destroy({ where: { token: token } }).then(() => {
                 Response.status(500).json({
                     message: "Code Expired... Try Again...!"
                 });
@@ -612,9 +619,9 @@ exports.ResetPassword = (Request, Response) => {
 
             bcrypt.hash(Password, saltRounds).then(hashedPassword => {
 
-                UserModel.findOneAndUpdate({ _id: user_id }, { Password: hashedPassword }).then((Updated) => {
-                    if (Updated) {
-                        Token.findOneAndDelete({ token: token }).then(() => {
+                UserModel.update({ Password: hashedPassword }, { where: { id: user_id } }).then((affectedCount) => {
+                    if (affectedCount[0] > 0) {
+                        Token.destroy({ where: { token: token } }).then(() => {
                             Response.status(200).json({
                                 status: "SUCCESS",
                                 message: "Password successfully changed...!"
@@ -658,7 +665,7 @@ exports.ResetPassword = (Request, Response) => {
 
 exports.GetUserInformation = (Request, Response) => {
 
-    UserModel.findById(Request.user.id).select("-Password").then(Result => {
+    UserModel.findByPk(Request.user.id, { attributes: { exclude: ['Password'] } }).then(Result => {
         Response.status(200).json({
             user: Result
         });
@@ -678,7 +685,7 @@ exports.GetUserInformation = (Request, Response) => {
 
 exports.GetAllUsersInformation = (Request, Response) => {
 
-    UserModel.find().select("-Password").then(Result => {
+    UserModel.findAll({ attributes: { exclude: ['Password'] } }).then(Result => {
         Response.status(200).json({
             users: Result
         });
@@ -733,10 +740,12 @@ exports.UpdateUser = (Request, Response) => {
         });
 
     } else {
-        UserModel.findOneAndUpdate({ _id: Request.user.id }, { FirstName, LastName, DateOfBirth: DateOfBirth, Avatar, Background, Gender, MobileNumber, State, District, PinCode, BankAccountNumber, IFSC, UPI }).then(Result => {
-            Response.status(200).json({
-                message: "Successfully updated user...!",
-                result: Result
+        UserModel.update({ FirstName, LastName, DateOfBirth: DateOfBirth, Avatar, Background, Gender, MobileNumber, State, District, PinCode, BankAccountNumber, IFSC, UPI }, { where: { id: Request.user.id } }).then(() => {
+            UserModel.findByPk(Request.user.id).then(Result => {
+                Response.status(200).json({
+                    message: "Successfully updated user...!",
+                    result: Result
+                });
             });
 
         }).catch(Error => {
@@ -757,11 +766,13 @@ exports.UpdateUserRole = (Request, Response) => {
 
     const { isAdmin } = Request.body;
 
-    UserModel.findOneAndUpdate({ _id: Request.params.id }, { isAdmin }).then(Result => {
-        Response.status(200).json({
-            message: "Successfully updated user...!",
-            Name: Result.Name,
-            isAdmin: Result.isAdmin
+    UserModel.update({ isAdmin }, { where: { id: Request.params.id } }).then(() => {
+        UserModel.findByPk(Request.params.id).then(Result => {
+            Response.status(200).json({
+                message: "Successfully updated user...!",
+                Name: Result.FirstName, // UserModel has FirstName, not Name
+                isAdmin: Result.isAdmin
+            });
         });
 
     }).catch(Error => {
@@ -780,7 +791,7 @@ exports.UpdateUserRole = (Request, Response) => {
 exports.DeleteUser = (Request, Response) => {
 
     try {
-        UserModel.findByIdAndDelete({ _id: Request.params.id }).then(Result => {
+        UserModel.destroy({ where: { id: Request.params.id } }).then(Result => {
             Response.status(200).json({
                 message: "User Deleted Successfully...!"
             });
@@ -809,7 +820,7 @@ exports.FindUser = (Request, Response) => {
 
     const user_ID = Request.query.user;
 
-    UserModel.findById(user_ID).select("-Password").then(User => {
+    UserModel.findByPk(user_ID, { attributes: { exclude: ['Password'] } }).then(User => {
         Response.status(200).json({
             message: "User Fetched",
             user: User
@@ -824,51 +835,37 @@ exports.FindUser = (Request, Response) => {
 
 };
 
-
-
-
 /********************* Function To Validate Email *********************/
 
-function validateEmail(email) {
+const validateEmail = (email) => {
     const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
 };
 
-
 /********************* Function To Validate Pin Code *********************/
 
-function validPinCode(pin) {
-
+const validPinCode = (pin) => {
     if (/^[1-9][0-9]{5}$/.test(pin)) {
         return true;
-
     } else { return false; }
-
 };
-
 
 /********************* Function To Validate Mobile Number *********************/
 
-function validateMobileNumber(number) {
+const validateMobileNumber = (number) => {
     const re = /^[6-9]\d{9}$/gi;
     return re.test(number);
 };
 
-
 /********************* Function To Generate Code *********************/
 
 const generateCode = () => {
-    const keys = "1234567890";
-    const length = 6;
-    code = "";
-
-    for (let i = 0; i < length; i++) {
-        code += keys.charAt(Math.floor(Math.random() * keys.length));
+    let Code = "";
+    for (let i = 0; i < 6; i++) {
+        Code += Math.floor(Math.random() * 10);
     }
-
-    return code;
+    return Code;
 };
-
 
 /********************* Function To Create ACTIVATION_TOKEN_SECRET *********************/
 
@@ -876,13 +873,11 @@ const createActivationToken = (payload) => {
     return jwt.sign(payload, process.env.ACTIVATION_TOKEN_SECRET, { expiresIn: '5m' });
 };
 
-
 /********************* Function To Create ACCESS_TOKEN_SECRET *********************/
 
 const createAccessToken = (payload) => {
     return jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
 };
-
 
 /********************* Function To Create REFRESH_TOKEN_SECRET *********************/
 

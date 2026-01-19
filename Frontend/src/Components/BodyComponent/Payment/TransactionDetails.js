@@ -61,8 +61,12 @@ function TransactionDetails(props) {
         };
     }, [OrderID, status, txnAmount]);
 
+    useEffect(() => {
+        setLoading(false);
+    }, []);
+
     return (
-        <div className="TransactionDetails" onLoad={() => setLoading(false)}>
+        <div className="TransactionDetails">
 
             {loading && <Loading loading={loading} />}
             {Success && <SuccessMessage message={Success} />}

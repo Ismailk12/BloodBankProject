@@ -1,8 +1,7 @@
 /********************* Import The Models *********************/
 
 const BloodBankModel = require("../Models/BloodBankModel");
-
-
+const { Op } = require("sequelize");
 
 /********************* Export The Controller Functionality *********************/
 
@@ -74,8 +73,7 @@ exports.AddNewBloodBank = (Request, Response) => {
         });
 
     } else {
-
-        const NewBloodBank = new BloodBankModel({
+        BloodBankModel.create({
             State,
             District,
             City,
@@ -112,9 +110,7 @@ exports.AddNewBloodBank = (Request, Response) => {
             Type,
             BloodType,
             LastUpdated
-        });
-
-        NewBloodBank.save().then((Result) => {
+        }).then((Result) => {
             Response.status(200).json({
                 message: "Blood Bank Added Successfully",
                 bloodBankName: Result.BloodBank
@@ -129,8 +125,6 @@ exports.AddNewBloodBank = (Request, Response) => {
     }
 
 };
-
-
 
 ///**************** (2) Filter Blood Banks ****************///
 
@@ -153,26 +147,23 @@ exports.FilterBloodBanks = (Request, Response) => {
         Filters.District = District;
     }
 
-    BloodBankModel.find(Filters).then(Result => {
-        let PageLimit = Limit;
-        let TemporaryArray = [];
+    BloodBankModel.findAll({ where: Filters }).then(Result => {
+        let PageLimit = Limit || Result.length;
+        let PageNumber = parseInt(Page);
 
         const Paginate = (Array, PageSize, PageNumber) => {
-
-            let PaginatedResult = [];
-            PaginatedResult = Array.slice((PageNumber - 1) * PageSize, PageNumber * PageSize);
+            let PaginatedResult = Array.slice((PageNumber - 1) * PageSize, PageNumber * PageSize);
             return PaginatedResult;
-
         };
 
-        TemporaryArray = Paginate(Result, PageLimit, Page);
+        let TemporaryArray = Paginate(Result, PageLimit, PageNumber);
 
         Response.status(200).json({
             message: "Blood Bank Filtered List",
             totalResult: Result,
             bloodBanks: TemporaryArray,
             totalResultsCount: Result.length,
-            pageNumber: Page,
+            pageNumber: PageNumber,
             limit: PageLimit
         });
 
@@ -187,14 +178,12 @@ exports.FilterBloodBanks = (Request, Response) => {
 
 };
 
-
-
 ///**************** (3) Get Blood Banks By Email ****************///
 
 exports.GetBloodBanksByEmail = (Request, Response) => {
     const { Email } = Request.body;
 
-    BloodBankModel.find({ Email }).then(Result => {
+    BloodBankModel.findAll({ where: { Email } }).then(Result => {
         Response.status(200).json({
             message: "Blood Banks Fetched",
             result: Result
@@ -207,15 +196,13 @@ exports.GetBloodBanksByEmail = (Request, Response) => {
         });
     });
 };
-
-
 
 ///**************** (4) Get Blood Banks By Location ****************///
 
 exports.GetBloodBanksByLocation = (Request, Response) => {
     const { state, district } = Request.body;
 
-    BloodBankModel.find({ State: state, District: district }).then(Result => {
+    BloodBankModel.findAll({ where: { State: state, District: district } }).then(Result => {
         Response.status(200).json({
             message: "Blood Banks Fetched",
             result: Result
@@ -229,18 +216,22 @@ exports.GetBloodBanksByLocation = (Request, Response) => {
     });
 };
 
-
-
 ///**************** (5) Delete Blood Bank ****************///
 
 exports.DeleteBloodBank = (Request, Response) => {
     const { BloodBank } = Request.body;
 
-    BloodBankModel.findOneAndDelete({ BloodBank }).then((Result) => {
-        Response.status(200).json({
-            message: "Successfully deleted Blood Bank",
-            deletedBloodBank: Result.BloodBank
-        });
+    BloodBankModel.destroy({ where: { BloodBank } }).then((Result) => {
+        if (Result > 0) {
+            Response.status(200).json({
+                message: "Successfully deleted Blood Bank",
+                deletedBloodBank: BloodBank
+            });
+        } else {
+            Response.status(404).json({
+                message: "Blood Bank Not Found"
+            });
+        }
 
     }).catch(Error => {
         Response.status(500).json({
@@ -251,8 +242,6 @@ exports.DeleteBloodBank = (Request, Response) => {
 
 };
 
-
-
 /********************* Function To Validate Email *********************/
 
 function validateEmail(email) {
@@ -260,18 +249,13 @@ function validateEmail(email) {
     return re.test(email);
 };
 
-
 /********************* Function To Validate Pin Code *********************/
 
 function validPinCode(pin) {
-
     if (/^[1-9][0-9]{5}$/.test(pin)) {
         return true;
-
     } else { return false; }
-
 };
-
 
 /********************* Function To Validate Mobile Number *********************/
 

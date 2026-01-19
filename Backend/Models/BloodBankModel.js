@@ -1,220 +1,159 @@
-/********************* Import The Mongoose Library *********************/
+const { DataTypes } = require('sequelize');
+const sequelize = require('../Database/Database');
 
-const Mongoose = require("mongoose");
-
-
-
-/********************* Create The Schema *********************/
-
-const BloodBankSchema = new Mongoose.Schema({
-
-    ///**************** Declare The Fields Present In The Collection ****************///
-
+const BloodBank = sequelize.define('BloodBank', {
+    id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true
+    },
     State: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     District: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     City: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     BloodBank: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     ParentHospital: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     ShortName: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     Category: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     ContactPerson: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     Email: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        allowNull: false
     },
-
     Phone: {
-        type: Number,
-        required: true
+        type: DataTypes.STRING, // Using String for phone to accommodate varied formats
+        allowNull: false
     },
-
     FAX: {
-        type: Number
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     Licence: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     FromDate: {
-        type: Date
+        type: DataTypes.DATE,
+        allowNull: true
     },
-
     ToDate: {
-        type: Date
+        type: DataTypes.DATE,
+        allowNull: true
     },
-
     ComponentFacility: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     ApheresisFacility: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     HelplineNumber: {
-        type: Number
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     Address: {
-        type: String,
-        required: true
+        type: DataTypes.TEXT,
+        allowNull: false
     },
-
     PinCode: {
-        type: Number,
-        required: true
+        type: DataTypes.INTEGER,
+        allowNull: false
     },
-
     Website: {
-        type: String,
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     NumberOfBeds: {
-        type: Number
+        type: DataTypes.INTEGER,
+        allowNull: true
     },
-
     DonorType: {
-        type: Array,
-        required: true
+        type: DataTypes.JSON, // Stores as JSON string in SQLite
+        allowNull: false
     },
-
     DonationType: {
-        type: Array,
-        required: true
+        type: DataTypes.JSON,
+        allowNull: false
     },
-
     ComponentType: {
-        type: Array
+        type: DataTypes.JSON,
+        allowNull: true
     },
-
     BagType: {
-        type: Array
+        type: DataTypes.JSON,
+        allowNull: true
     },
-
     TTIType: {
-        type: Array
+        type: DataTypes.JSON,
+        allowNull: true
     },
-
     Remarks: {
-        type: String
+        type: DataTypes.TEXT,
+        allowNull: true
     },
-
-    ChargeTarrifDetails: [{
-        TarrifName: {
-            type: String
-        },
-
-        ChargesInRs: {
-            type: String
-        }
-    }
-    ],
-
-    AreaDetails: [{
-        AreaName: {
-            type: String,
-            required: true
-        },
-
-        AreaUsability: {
-            type: String,
-            required: true
-        },
-
-        RoomNumber: {
-            type: String,
-            required: true
-        },
-    }
-    ],
-
-    StorageDetails: [{
-        StorageName: {
-            type: String,
-            required: true
-        },
-
-        StorageType: {
-            type: String,
-            required: true
-        },
-
-        AreaName: {
-            type: String,
-            required: true
-        },
-    }
-    ],
-
-    RefreshmentDetails: [{
-        RefreshmentName: {
-            type: String,
-            required: true
-        },
-
-        RefreshmentQuantity: {
-            type: String,
-            required: true
-        }
-    }
-    ],
-
+    ChargeTarrifDetails: {
+        type: DataTypes.JSON,
+        allowNull: true
+    },
+    AreaDetails: {
+        type: DataTypes.JSON,
+        allowNull: true
+    },
+    StorageDetails: {
+        type: DataTypes.JSON,
+        allowNull: true
+    },
+    RefreshmentDetails: {
+        type: DataTypes.JSON,
+        allowNull: true
+    },
     UserType: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     Availability: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     Type: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     BloodType: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     },
-
     LastUpdated: {
-        type: String
+        type: DataTypes.STRING,
+        allowNull: true
     }
-
 }, {
+    tableName: 'BloodBanks',
     timestamps: true
 });
 
-
-
-/********************* Create The Model From Schema And Connect To The MongoDB Collection And Export The Model *********************/
-
-module.exports = Mongoose.model("BloodBankModel", BloodBankSchema, "BloodBanks");
+module.exports = BloodBank;

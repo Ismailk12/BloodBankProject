@@ -77,7 +77,18 @@ function DonationCampPage() {
         setSelectedDistrict("");
         const value = e.target.value;
         setSelectedState(value);
-        setDistrict(state.find(location => location.state === value).districts);
+        const foundState = state.find(location => location.state === value);
+        if (foundState && foundState.district) {
+            try {
+                const parsedDistricts = JSON.parse(foundState.district);
+                setDistrict(parsedDistricts);
+            } catch (error) {
+                console.error("Error parsing districts:", error);
+                setDistrict([]);
+            }
+        } else {
+            setDistrict([]);
+        }
         setPage(1);
     };
 
@@ -86,7 +97,18 @@ function DonationCampPage() {
         setSelectedDistrict("");
         const value = e.target.value;
         setSelectedState(value);
-        setDistrict(state.find(location => location.state === value).districts);
+        const foundState = state.find(location => location.state === value);
+        if (foundState && foundState.district) {
+            try {
+                const parsedDistricts = JSON.parse(foundState.district);
+                setDistrict(parsedDistricts);
+            } catch (error) {
+                console.error("Error parsing districts:", error);
+                setDistrict([]);
+            }
+        } else {
+            setDistrict([]);
+        }
         setPageLoad(true);
         setPage(1);
     };
@@ -214,7 +236,7 @@ function DonationCampPage() {
 
                                 {
                                     district.map((element) => (
-                                        <option key={element.index} name="District" value={element.district}>{element.district}</option>
+                                        <option key={element.index} name="District" value={element.name}>{element.name}</option>
                                     ))
                                 }
                             </select>
@@ -277,7 +299,7 @@ function DonationCampPage() {
                             SearcByBLoodBank.length > 0
                                 ?
                                 totalCamps &&
-                                totalCamps.filter(item => (item.CampName).toLowerCase().includes(SearcByBLoodBank.toLowerCase())).map((element, index) => (
+                                totalCamps.filter(item => (item.CampName || "").toLowerCase().includes(SearcByBLoodBank.toLowerCase())).map((element, index) => (
                                     <tr key={index}>
                                         <td>{index + 1}</td>
                                         <td>{element.Date}</td>
@@ -289,13 +311,13 @@ function DonationCampPage() {
                                         <td>{element.Contact}</td>
                                         <td>{element.ConductedBy}</td>
                                         <td>{element.OrganizedBy}</td>
-                                        <td>{element.Register.length === 0 ? "NA" : element.Register}</td>
+                                        <td>{(element.Register || "").length === 0 ? "NA" : element.Register}</td>
                                     </tr>
                                 ))
                                 :
                                 getAll === true
                                     ? totalCamps &&
-                                    totalCamps.filter(item => (item.CampName).toLowerCase().includes(searchText.toLowerCase()) || (item.Address).toLowerCase().includes(searchText.toLowerCase())).map((element, index) => (
+                                    totalCamps.filter(item => (item.CampName || "").toLowerCase().includes(searchText.toLowerCase()) || (item.Address || "").toLowerCase().includes(searchText.toLowerCase())).map((element, index) => (
                                         <tr key={index}>
                                             <td>{index + 1}</td>
                                             <td>{element.Date}</td>
@@ -307,12 +329,12 @@ function DonationCampPage() {
                                             <td>{element.Contact}</td>
                                             <td>{element.ConductedBy}</td>
                                             <td>{element.OrganizedBy}</td>
-                                            <td>{element.Register.length === 0 ? "NA" : element.Register}</td>
+                                            <td>{(element.Register || "").length === 0 ? "NA" : element.Register}</td>
                                         </tr>
                                     ))
 
                                     : camps &&
-                                    camps.filter(item => (item.CampName).toLowerCase().includes(searchText.toLowerCase()) || (item.Address).toLowerCase().includes(searchText.toLowerCase())).map((element, index) => (
+                                    camps.filter(item => (item.CampName || "").toLowerCase().includes(searchText.toLowerCase()) || (item.Address || "").toLowerCase().includes(searchText.toLowerCase())).map((element, index) => (
                                         <tr key={index}>
                                             <td>{index + 1}</td>
                                             <td>{element.Date}</td>
@@ -324,7 +346,7 @@ function DonationCampPage() {
                                             <td>{element.Contact}</td>
                                             <td>{element.ConductedBy}</td>
                                             <td>{element.OrganizedBy}</td>
-                                            <td>{element.Register.length === 0 ? "NA" : element.Register}</td>
+                                            <td>{(element.Register || "").length === 0 ? "NA" : element.Register}</td>
                                         </tr>
                                     ))
                         }

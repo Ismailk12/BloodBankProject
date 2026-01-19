@@ -37,7 +37,7 @@ function DonationRequestPage() {
         let isMount = true;
 
         Server.get("/locations").then((Response) => {
-            if(isMount){
+            if (isMount) {
                 setState(Response.data.states);
             };
 
@@ -45,7 +45,7 @@ function DonationRequestPage() {
             setData({ ...data, Success: "", Error: Error.response.data.message });
         });
 
-        return () => {isMount=false;};
+        return () => { isMount = false; };
     }, [data]);
 
     useEffect(() => {
@@ -76,15 +76,28 @@ function DonationRequestPage() {
     }, [GoIID]);
 
     const handleState = (e) => {
-        document.getElementById('district').value = "Select District";
+        const districtSelect = document.getElementById('district');
+        if (districtSelect) districtSelect.value = "Select District";
         setSelectedDistrict("");
         const value = e.target.value;
         setSelectedState(value)
-        setDistrict(state.find(location => location.state === value).districts);
+        const foundState = state.find(location => location.state === value);
+        if (foundState && foundState.district) {
+            try {
+                const parsedDistricts = JSON.parse(foundState.district);
+                setDistrict(parsedDistricts);
+            } catch (error) {
+                console.error("Error parsing districts:", error);
+                setDistrict([]);
+            }
+        } else {
+            setDistrict([]);
+        }
     };
 
     const handleDistrict = (e) => {
-        document.getElementById('bloodBank').value = "Select Blood Bank";
+        const bloodBankSelect = document.getElementById('bloodBank');
+        if (bloodBankSelect) bloodBankSelect.value = "Select Blood Bank";
         setSelectedBloodBank("");
         const value = e.target.value;
         setSelectedDistrict(value);
@@ -212,7 +225,7 @@ function DonationRequestPage() {
 
                                     {
                                         district.map((element) => (
-                                            <option key={element.index} value={element.district}>{element.district}</option>
+                                            <option key={element.index} value={element.name}>{element.name}</option>
                                         ))
                                     }
                                 </select>
@@ -226,7 +239,7 @@ function DonationRequestPage() {
 
                                     {
                                         bloodBanks.map((element) => (
-                                            <option key={element._id} value={element.BloodBank} >{element.BloodBank}</option>
+                                            <option key={element.id} value={element.BloodBank} >{element.BloodBank}</option>
                                         ))
                                     }
                                 </select>

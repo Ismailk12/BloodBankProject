@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './HomePage.css';
 import { Link } from 'react-router-dom';
 import Carousel from '../../HelperComponents/ReactCarousel/carousel';
@@ -8,8 +8,12 @@ function HomePage() {
 
     const [loading, setLoading] = useState(true);
 
+    useEffect(() => {
+        setLoading(false);
+    }, []);
+
     return (
-        <div className="HomePage" onLoad={() => setLoading(false)}>
+        <div className="HomePage">
 
             {loading && <Loading loading={loading} />}
 

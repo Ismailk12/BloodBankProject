@@ -2,8 +2,6 @@
 
 const DonationRequest = require("../Models/DonationRequestModel");
 
-
-
 /********************* Export The Controller Functionality *********************/
 
 ///**************** Save Donation Request ****************///
@@ -25,7 +23,7 @@ exports.SaveDonationRequest = (Request, Response) => {
         GoIIDNumber
     } = Request.body;
 
-    const newDonationRequest = new DonationRequest({
+    DonationRequest.create({
         Name,
         Gender,
         DateOfBirth,
@@ -38,9 +36,7 @@ exports.SaveDonationRequest = (Request, Response) => {
         BloodGroup,
         GoIID,
         GoIIDNumber
-    });
-
-    newDonationRequest.save().then(Result => {
+    }).then(Result => {
         Response.status(200).json(
             {
                 message: "Request Saved",

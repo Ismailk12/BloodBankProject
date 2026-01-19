@@ -2,8 +2,6 @@
 
 const FundraisingModel = require("../Models/FundraisingModel");
 
-
-
 /********************* Export The Controller Functionality *********************/
 
 ///**************** (1) Rais Fund ****************///
@@ -19,16 +17,14 @@ exports.RaisFund = (Request, Response) => {
         Image
     } = Request.body;
 
-    const NewFundraising = new FundraisingModel({
+    FundraisingModel.create({
         UserID,
         Email,
         Heading,
         Amount,
         Description,
         Image
-    });
-
-    NewFundraising.save().then(Result => {
+    }).then(Result => {
         Response.status(200).json({
             message: "Data saved successfully",
             result: Result
@@ -43,13 +39,11 @@ exports.RaisFund = (Request, Response) => {
 
 };
 
-
-
 ///**************** (2) Get All Fundraisings ****************///
 
 exports.GetAllFundraisings = (Request, Response) => {
 
-    FundraisingModel.find().then(Result => {
+    FundraisingModel.findAll().then(Result => {
         Response.status(200).json({
             message: "Data fetched",
             result: Result
@@ -62,15 +56,13 @@ exports.GetAllFundraisings = (Request, Response) => {
         });
     });
 };
-
-
 
 ///**************** (3) Get Fundraisings By Email ****************///
 
 exports.GetFundraisingByEmail = (Request, Response) => {
     const { Email } = Request.body;
 
-    FundraisingModel.find({ Email }).then(Result => {
+    FundraisingModel.findAll({ where: { Email } }).then(Result => {
         Response.status(200).json({
             message: "Data fetched",
             result: Result
@@ -83,15 +75,13 @@ exports.GetFundraisingByEmail = (Request, Response) => {
         });
     });
 };
-
-
 
 ///**************** (4) Get Fundraisings By ID ****************///
 
 exports.GetFundraisingByID = (Request, Response) => {
     const { ID } = Request.body;
 
-    FundraisingModel.findById({ _id: ID }).then(Result => {
+    FundraisingModel.findByPk(ID).then(Result => {
         Response.status(200).json({
             message: "Data fetched",
             result: Result
@@ -104,8 +94,6 @@ exports.GetFundraisingByID = (Request, Response) => {
         });
     });
 };
-
-
 
 ///**************** (5) Update Fundraising ****************///
 
@@ -113,10 +101,12 @@ exports.UpdateFundraising = (Request, Response) => {
 
     const { FundID, RecievedFunds, Heading, Amount, Description, Image } = Request.body;
 
-    FundraisingModel.findOneAndUpdate({ _id: FundID }, { RecievedFunds: RecievedFunds, Heading, Amount, Description, Image }).then(Result => {
-        Response.status(200).json({
-            message: "Successfully Updated",
-            result: Result
+    FundraisingModel.update({ RecievedFunds, Heading, Amount, Description, Image }, { where: { id: FundID } }).then(() => {
+        FundraisingModel.findByPk(FundID).then(Result => {
+            Response.status(200).json({
+                message: "Successfully Updated",
+                result: Result
+            });
         });
 
     }).catch(Error => {
@@ -127,20 +117,18 @@ exports.UpdateFundraising = (Request, Response) => {
     });
 };
 
-
-
 ///**************** (6) Delete Fundraising ****************///
 
 exports.DeleteFundraising = (Request, Response) => {
-    FundraisingModel.findByIdAndDelete({ _id: Request.params.id }).then(() => {
+    FundraisingModel.destroy({ where: { id: Request.params.id } }).then(() => {
         Response.status(200).json({
-            message: "User Deleted Successfully...!"
+            message: "Fundraising Deleted Successfully...!"
         });
 
     }).catch(Error => {
         Response.status(500).json({
             error: Error.message,
-            message: "An error occured while deleting user...!"
+            message: "An error occured while deleting fundraising...!"
         });
     });
 };

@@ -113,7 +113,7 @@ function OtherUsersProfile() {
     useEffect(() => {
         let isMount = true;
 
-        if (isMount === true) {
+        if (isMount === true && userData.Email) {
             Server.post("/getBloodBanksByEmail", { Email: userData.Email }).then(Response => {
                 setBloodBank(Response.data.result);
 
@@ -131,7 +131,7 @@ function OtherUsersProfile() {
     useEffect(() => {
         let isMount = true;
 
-        if (isMount === true) {
+        if (isMount === true && userData.Email) {
             Server.post("/getDonationCampsByEmail", { Email: userData.Email }).then(Response => {
                 setDonationCamp(Response.data.camps);
 
@@ -149,7 +149,7 @@ function OtherUsersProfile() {
     useEffect(() => {
         let isMount = true;
 
-        if (isMount === true) {
+        if (isMount === true && userData.Email) {
             Server.post("/getfundraisingbyemail", { Email: userData.Email }).then(Response => {
                 setDonationRequest(Response.data.result);
 
@@ -202,8 +202,18 @@ function OtherUsersProfile() {
         setClickedDonationCamp(false);
     };
 
+    useEffect(() => {
+        setLoading(false);
+    }, []);
+
+    if (!userData) {
+        return <div className="UserProfile">
+            <h1 style={{ color: "white", textAlign: "center", marginTop: "100px" }}>User Not Found</h1>
+        </div>
+    };
+
     return (
-        <div className="UserProfile" onLoad={() => setLoading(false)}>
+        <div className="UserProfile">
 
             {loading && <Loading loading={loading} />}
             {Success && <SuccessMessage message={Success} />}
@@ -211,10 +221,10 @@ function OtherUsersProfile() {
 
             <section className="UserProfile_TopSection">
                 <div className="UserProfile_Image_body">
-                    <img className="UserProfile_Background_Image" src={userData.Background} alt="" />
+                    <img className="UserProfile_Background_Image" src={userData.Background} alt="" onError={(e) => { e.target.onerror = null; e.target.src = "https://www.w3schools.com/w3css/img_lights.jpg" }} />
 
                     <div className="UserProfile_Profile_Image">
-                        <img src={userData.Avatar} alt="" />
+                        <img src={userData.Avatar} alt="" onError={(e) => { e.target.onerror = null; e.target.src = "https://www.w3schools.com/howto/img_avatar.png" }} />
                     </div>
 
                     <div className="UserProfile_User_Name">{userData.FirstName + " " + userData.LastName}</div>

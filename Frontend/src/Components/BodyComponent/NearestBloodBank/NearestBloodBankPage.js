@@ -75,7 +75,18 @@ function NearestBloodBankPage() {
         setSelectedDistrict("");
         const value = e.target.value;
         setSelectedState(value);
-        setDistrict(state.find(location => location.state === value).districts);
+        const foundState = state.find(location => location.state === value);
+        if (foundState && foundState.district) {
+            try {
+                const parsedDistricts = JSON.parse(foundState.district);
+                setDistrict(parsedDistricts);
+            } catch (error) {
+                console.error("Error parsing districts:", error);
+                setDistrict([]);
+            }
+        } else {
+            setDistrict([]);
+        }
         setPage(1);
     };
 
@@ -149,7 +160,7 @@ function NearestBloodBankPage() {
 
                             {
                                 district.map((element) => (
-                                    <option key={element.index} name="District" value={element.district}>{element.district}</option>
+                                    <option key={element.index} name="District" value={element.name}>{element.name}</option>
                                 ))
                             }
                         </select>
@@ -204,7 +215,7 @@ function NearestBloodBankPage() {
                             searchByName.length > 0
                                 ?
                                 totalBloodBanks &&
-                                totalBloodBanks.filter(item => (item.BloodBank).toLowerCase().includes(searchText.toLowerCase()) || (item.Address).toLowerCase().includes(searchText.toLowerCase())).map((items, index) => (
+                                totalBloodBanks.filter(item => (item.BloodBank || "").toLowerCase().includes(searchText.toLowerCase()) || (item.Address || "").toLowerCase().includes(searchText.toLowerCase())).map((items, index) => (
                                     <tr key={index}>
                                         <td>{index + 1}</td>
                                         <td>{items.BloodBank}</td>
@@ -219,7 +230,7 @@ function NearestBloodBankPage() {
                                 :
                                 getAll === true
                                     ? totalBloodBanks &&
-                                    totalBloodBanks.filter(item => (item.BloodBank).toLowerCase().includes(searchText.toLowerCase()) || (item.Address).toLowerCase().includes(searchText.toLowerCase())).map((items, index) => (
+                                    totalBloodBanks.filter(item => (item.BloodBank || "").toLowerCase().includes(searchText.toLowerCase()) || (item.Address || "").toLowerCase().includes(searchText.toLowerCase())).map((items, index) => (
                                         <tr key={index}>
                                             <td>{index + 1}</td>
                                             <td>{items.BloodBank}</td>
@@ -233,7 +244,7 @@ function NearestBloodBankPage() {
                                     ))
                                     :
                                     bloodBanks &&
-                                    bloodBanks.filter(item => (item.BloodBank).toLowerCase().includes(searchText.toLowerCase()) || (item.Address).toLowerCase().includes(searchText.toLowerCase())).map((items, index) => (
+                                    bloodBanks.filter(item => (item.BloodBank || "").toLowerCase().includes(searchText.toLowerCase()) || (item.Address || "").toLowerCase().includes(searchText.toLowerCase())).map((items, index) => (
                                         <tr key={index}>
                                             <td>{index + 1}</td>
                                             <td>{items.BloodBank}</td>

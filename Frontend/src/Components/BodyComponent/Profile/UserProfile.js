@@ -146,7 +146,8 @@ function UserProfile() {
         } else if (name === "State") {
             document.getElementById('district').value = "SelectDistrict";
             setSelectedState(e.target.value);
-            setDistrict(state.find(location => location.state === e.target.value).districts);
+            const selectedStateObj = state.find(location => location.state === e.target.value);
+            setDistrict(JSON.parse(selectedStateObj.districts));
 
         } else if (name === "District") {
             setSelectedDistrict(value);
@@ -317,7 +318,7 @@ function UserProfile() {
     useEffect(() => {
         let isMount = true;
 
-        if (isMount === true) {
+        if (isMount === true && user.Email) {
             Server.post("/getBloodBanksByEmail", { Email: user.Email }).then(Response => {
                 setBloodBank(Response.data.result);
 
@@ -335,7 +336,7 @@ function UserProfile() {
     useEffect(() => {
         let isMount = true;
 
-        if (isMount === true) {
+        if (isMount === true && user.Email) {
             Server.post("/getDonationCampsByEmail", { Email: user.Email }).then(Response => {
                 setDonationCamp(Response.data.camps);
 
@@ -353,7 +354,7 @@ function UserProfile() {
     useEffect(() => {
         let isMount = true;
 
-        if (isMount === true) {
+        if (isMount === true && user.Email) {
             Server.post("/getfundraisingbyemail", { Email: user.Email }).then(Response => {
                 setDonationRequest(Response.data.result);
 
@@ -619,9 +620,13 @@ function UserProfile() {
         };
     };
 
+    useEffect(() => {
+        setLoading(false);
+    }, []);
+
     return (
 
-        <div className="UserProfile" onLoad={() => setLoading(false)}>
+        <div className="UserProfile">
 
             {loading && <Loading loading={loading} />}
             {Success && <SuccessMessage message={Success} />}
@@ -629,11 +634,11 @@ function UserProfile() {
 
             <section className="UserProfile_TopSection">
                 <div className="UserProfile_Image_body">
-                    <img className="UserProfile_Background_Image" src={user.Background} alt="" />
+                    <img className="UserProfile_Background_Image" src={user.Background} alt="" onError={(e) => { e.target.onerror = null; e.target.src = "https://www.w3schools.com/w3css/img_lights.jpg" }} />
                     <i className="fas fa-edit Background_Edit">Edit Background <input type="file" onChange={updateUserBackground} /></i>
 
                     <div className="UserProfile_Profile_Image">
-                        <img src={user.Avatar} alt="" />
+                        <img src={user.Avatar} alt="" onError={(e) => { e.target.onerror = null; e.target.src = "https://www.w3schools.com/howto/img_avatar.png" }} />
                         <i className="fas fa-edit Avatar_Edit">
                             <input type="file" onChange={updateUserAvatar} />
                         </i>
@@ -796,8 +801,8 @@ function UserProfile() {
                                     <option value="SelectDistrict" disabled>Select District</option>
 
                                     {
-                                        district.map((element) => (
-                                            <option key={element.index} name="District" value={element.district}>{element.district}</option>
+                                        district.map((element, index) => (
+                                            <option key={index} name="District" value={element.name}>{element.name}</option>
                                         ))
                                     }
                                 </select>
