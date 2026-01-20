@@ -6,6 +6,8 @@ const BodyParser = require("body-parser");
 const sequelize = require("./Database/Database"); // Sequelize instance
 const CookieParser = require("cookie-parser");
 const FileUpload = require("express-fileupload");
+const { BackendAI } = require("@backend-ai/sdk-express");
+
 
 /********************* Import The Routes *********************/
 
@@ -52,8 +54,20 @@ const PORT = process.env.PORT || 5000;
 
 /********************* Connect To SQLite & Sync Models *********************/
 
-sequelize.sync({ force: false }).then(() => {
+sequelize.sync({ force: false }).then(async () => {
     console.log("Connected to SQLite and Models Synced");
+
+    try {
+        await BackendAI.init(App, {
+            tenantId: process.env.TENANT_ID,
+            coreUrl: process.env.CORE_URL,
+            adapterId: process.env.ADAPTER_ID,
+            verbose: process.env.VERBOSE === 'true',
+        });
+        console.log("✅ Backend AI SDK Initialized");
+    } catch (error) {
+        console.error("❌ Failed to initialize Backend AI SDK:", error);
+    }
 
     /**************** Start The Server ****************/
 
@@ -62,4 +76,16 @@ sequelize.sync({ force: false }).then(() => {
     });
 }).catch(error => {
     console.error("Database Connection Error:", error);
+});
+
+/********************* Graceful Shutdown *********************/
+
+process.on("SIGTERM", async () => {
+    console.log("SIGTERM received. Shutting down gracefully...");
+    try {
+        await BackendAI.shutdown();
+    } catch (error) {
+        console.error("Error during SDK shutdown:", error);
+    }
+    process.exit(0);
 });

@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@backend-ai/sdk-express": "file:backend-ai-sdk-express-1.0.0.tgz",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.19.1",
     "cloudinary": "^1.28.1",
