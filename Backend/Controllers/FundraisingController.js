@@ -9,13 +9,14 @@ const FundraisingModel = require("../Models/FundraisingModel");
 exports.RaisFund = (Request, Response) => {
 
     const {
-        UserID,
         Email,
         Heading,
         Amount,
         Description,
         Image
     } = Request.body;
+
+    const UserID = Request.user.id;
 
     FundraisingModel.create({
         UserID,
